@@ -65,6 +65,9 @@ static char  *months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
 void
 ngx_time_init(void)
 {
+    //strlen和sizeof的区别
+    //strlen结果是不包含结尾null的长度，需要一次函数调用
+    //sizeof结果是包含结尾null的长度，sizeof在编译时计算缓冲区长度，所以不需要函数调用
     ngx_cached_err_log_time.len = sizeof("1970/09/28 12:00:00") - 1;
     ngx_cached_http_time.len = sizeof("Mon, 28 Sep 1970 06:00:00 GMT") - 1;
     ngx_cached_http_log_time.len = sizeof("28/Sep/1970:12:00:00 +0600") - 1;

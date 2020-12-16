@@ -105,7 +105,8 @@ typedef unsigned long               ngx_atomic_uint_t;
 
 typedef volatile ngx_atomic_uint_t  ngx_atomic_t;
 
-
+//__sync开头的是gcc内建的原子操作
+//__sync_bool_compare_and_swap的意思是：如果lock==old，则将值设为set
 #define ngx_atomic_cmp_set(lock, old, set)                                    \
     __sync_bool_compare_and_swap(lock, old, set)
 

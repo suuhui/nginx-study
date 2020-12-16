@@ -223,6 +223,7 @@ main(int argc, char *const *argv)
 
     /* TODO */ ngx_max_sockets = -1;
 
+    //设置nginx时间格式，例如error_log，http_log的时间格式
     ngx_time_init();
 
 #if (NGX_PCRE)
@@ -232,6 +233,7 @@ main(int argc, char *const *argv)
     ngx_pid = ngx_getpid();
     ngx_parent = ngx_getppid();
 
+    //设置error_log
     log = ngx_log_init(ngx_prefix);
     if (log == NULL) {
         return 1;
@@ -256,14 +258,18 @@ main(int argc, char *const *argv)
         return 1;
     }
 
+    //将shell命令行参数保存到nginx变量ngx_argv上，
+    //len(ngx_argv)比argc多1，且最后一项值为NULL
     if (ngx_save_argv(&init_cycle, argc, argv) != NGX_OK) {
         return 1;
     }
 
+    //解析部分nginx命令行参数，-p/-c/-g/-t/-T
     if (ngx_process_options(&init_cycle) != NGX_OK) {
         return 1;
     }
 
+    //初始化操作系统相关的参数，例如CPU，打开文件树等
     if (ngx_os_init(log) != NGX_OK) {
         return 1;
     }
@@ -286,6 +292,7 @@ main(int argc, char *const *argv)
         return 1;
     }
 
+    //加载默认模块
     if (ngx_preinit_modules() != NGX_OK) {
         return 1;
     }
@@ -916,10 +923,13 @@ ngx_process_options(ngx_cycle_t *cycle)
     u_char  *p;
     size_t   len;
 
+    //命令行-p参数可以指定ngx_prefix
+    //没有指定的话，用编译nginx是指定的--prefix参数
     if (ngx_prefix) {
         len = ngx_strlen(ngx_prefix);
         p = ngx_prefix;
 
+        //ngx_prefix结尾不为系统分隔符则在最后追加系统分隔符
         if (len && !ngx_path_separator(p[len - 1])) {
             p = ngx_pnalloc(cycle->pool, len + 1);
             if (p == NULL) {
@@ -930,6 +940,7 @@ ngx_process_options(ngx_cycle_t *cycle)
             p[len++] = '/';
         }
 
+        //ngx_prefix也会影响配置文件的前缀
         cycle->conf_prefix.len = len;
         cycle->conf_prefix.data = p;
         cycle->prefix.len = len;
@@ -970,14 +981,17 @@ ngx_process_options(ngx_cycle_t *cycle)
 #endif
     }
 
+    //如果使用-c指定了配置文件
     if (ngx_conf_file) {
         cycle->conf_file.len = ngx_strlen(ngx_conf_file);
         cycle->conf_file.data = ngx_conf_file;
 
     } else {
+        //默认配置文件
         ngx_str_set(&cycle->conf_file, NGX_CONF_PATH);
     }
 
+    //获取配置文件绝对路径prefix+conf_file
     if (ngx_conf_full_name(cycle, &cycle->conf_file, 0) != NGX_OK) {
         return NGX_ERROR;
     }
@@ -993,6 +1007,7 @@ ngx_process_options(ngx_cycle_t *cycle)
         }
     }
 
+    //命令行-g参数指定的全局指令
     if (ngx_conf_params) {
         cycle->conf_param.len = ngx_strlen(ngx_conf_params);
         cycle->conf_param.data = ngx_conf_params;
