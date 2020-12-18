@@ -47,9 +47,9 @@ struct ngx_pool_large_s {
 
 
 typedef struct {
-    u_char               *last;
-    u_char               *end;
-    ngx_pool_t           *next;
+    u_char               *last; //当前pool中已使用内存的结尾
+    u_char               *end; //当前pool的容量边界
+    ngx_pool_t           *next; //重新开辟的内存pool
     ngx_uint_t            failed;
 } ngx_pool_data_t;
 

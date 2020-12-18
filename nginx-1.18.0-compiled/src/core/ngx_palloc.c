@@ -156,10 +156,12 @@ ngx_palloc_small(ngx_pool_t *pool, size_t size, ngx_uint_t align)
     do {
         m = p->d.last;
 
+        //内存对齐到NGX_ALIGNMENT的倍数
         if (align) {
             m = ngx_align_ptr(m, NGX_ALIGNMENT);
         }
 
+        //当前pool中空间足够
         if ((size_t) (p->d.end - m) >= size) {
             p->d.last = m + size;
 
@@ -170,6 +172,7 @@ ngx_palloc_small(ngx_pool_t *pool, size_t size, ngx_uint_t align)
 
     } while (p);
 
+    //重新开辟一个当前pool大小的内存，并放在p->d.next上
     return ngx_palloc_block(pool, size);
 }
 

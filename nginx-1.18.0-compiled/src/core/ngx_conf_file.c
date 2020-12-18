@@ -459,7 +459,7 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
                     conf = confp[cf->cycle->modules[i]->ctx_index];
                 }
             }
-
+            //set为结构体ngx_command_s中的指针函数，用来设置变量
             rv = cmd->set(cf, cmd, conf);
 
             if (rv == NGX_CONF_OK) {
@@ -513,12 +513,12 @@ ngx_conf_read_token(ngx_conf_t *cf)
 
     found = 0;
     need_space = 0;
-    last_space = 1;
-    sharp_comment = 0;
-    variable = 0;
-    quoted = 0;
-    s_quoted = 0;
-    d_quoted = 0;
+    last_space = 1; //一个配置token结束后该值置为1，如：“{”，“worker_processes”，“http”
+    sharp_comment = 0; //#开头的注释
+    variable = 0; //$开头的变量
+    quoted = 0; //“\”开头的转义
+    s_quoted = 0; //双引号
+    d_quoted = 0; //单引号
 
     cf->args->nelts = 0;
     b = cf->conf_file->buffer;
@@ -529,9 +529,9 @@ ngx_conf_read_token(ngx_conf_t *cf)
     file_size = ngx_file_size(&cf->conf_file->file.info);
 
     for ( ;; ) {
-
+        //b->pos：当前读到的位置；b->last：配置文件结尾的位置
         if (b->pos >= b->last) {
-
+            //配置文件读完了或有错误
             if (cf->conf_file->file.offset >= file_size) {
 
                 if (cf->args->nelts > 0 || !last_space) {
@@ -581,7 +581,7 @@ ngx_conf_read_token(ngx_conf_t *cf)
             }
 
             size = (ssize_t) (file_size - cf->conf_file->file.offset);
-
+            //一次读取buffsize（4096）个字符；如果配置文件大于4096字符需要分开读
             if (size > b->end - (b->start + len)) {
                 size = b->end - (b->start + len);
             }
@@ -611,10 +611,10 @@ ngx_conf_read_token(ngx_conf_t *cf)
         }
 
         ch = *b->pos++;
-
+        //换行符
         if (ch == LF) {
             cf->conf_file->line++;
-
+            //换行后，将注释标记置为0
             if (sharp_comment) {
                 sharp_comment = 0;
             }

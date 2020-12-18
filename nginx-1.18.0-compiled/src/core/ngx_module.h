@@ -211,7 +211,7 @@
     NGX_MODULE_SIGNATURE_30 NGX_MODULE_SIGNATURE_31 NGX_MODULE_SIGNATURE_32   \
     NGX_MODULE_SIGNATURE_33 NGX_MODULE_SIGNATURE_34
 
-
+//用来初始化ngx_module_s中前7个成员
 #define NGX_MODULE_V1                                                         \
     NGX_MODULE_UNSET_INDEX, NGX_MODULE_UNSET_INDEX,                           \
     NULL, 0, 0, nginx_version, NGX_MODULE_SIGNATURE

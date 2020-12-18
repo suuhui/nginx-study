@@ -72,6 +72,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     }
     pool->log = log;
 
+    //在pool上分配出cycle所需的空间
     cycle = ngx_pcalloc(pool, sizeof(ngx_cycle_t));
     if (cycle == NULL) {
         ngx_destroy_pool(pool);
@@ -200,7 +201,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
     }
 
     /* on Linux gethostname() silently truncates name that does not fit */
-
+    //获得本机主机名称
     hostname[NGX_MAXHOSTNAMELEN - 1] = '\0';
     cycle->hostname.len = ngx_strlen(hostname);
 
@@ -212,7 +213,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
     ngx_strlow(cycle->hostname.data, (u_char *) hostname, cycle->hostname.len);
 
-
+    //申请nginx模块所需的内存
     if (ngx_cycle_modules(cycle) != NGX_OK) {
         ngx_destroy_pool(pool);
         return NULL;
@@ -232,6 +233,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
                 ngx_destroy_pool(pool);
                 return NULL;
             }
+            //经过main函数中的ngx_preinit_modules方法，module->index已经被设置为modules数组中的下标
             cycle->conf_ctx[cycle->modules[i]->index] = rv;
         }
     }
