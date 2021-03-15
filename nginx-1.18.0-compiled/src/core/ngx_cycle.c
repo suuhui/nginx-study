@@ -243,6 +243,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
 
     ngx_memzero(&conf, sizeof(ngx_conf_t));
+    //在pool上申请10个ngx_str_t的内存空间
     /* STUB: init array ? */
     conf.args = ngx_array_create(pool, 10, sizeof(ngx_str_t));
     if (conf.args == NULL) {
